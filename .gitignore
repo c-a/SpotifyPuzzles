@@ -1,0 +1,7 @@
+*.metadata
+
+*bin/
+*gen/
+
+*.o
+*anjuta*
