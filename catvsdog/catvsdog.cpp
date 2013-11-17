@@ -43,7 +43,7 @@ private:
     memset(visited, false, sizeof(bool)*NODES);
     memset(pred, -1, sizeof(int)*NODES);
 
-    // Find augmenting path.
+    // Find augmenting path using BFS == Edmonds-Karp.
     visited[source_] = true;
     Q.push(source_);
     stop = false;
@@ -108,13 +108,13 @@ int main(int argc, char* argv[])
   std::map<int, int> flow[500+2];
   MaxFlow<500+2> maxFlow;
 
-  std::cin >> N;
+  scanf("%d", &N);
   for (int n = 0; n < N; n++)
   {
     int C, D, V;
     std::vector<Vote> dogLovers, catLovers;
 
-    std::cin >>  C >> D >> V;
+    scanf("%d %d %d", &C, &D, &V);
 
     for (int v = 0; v < V; v++)
     {
@@ -126,6 +126,16 @@ int main(int argc, char* argv[])
       else
         dogLovers.push_back(Vote(atoi(P1+1), atoi(P2+1)));
     }
+
+    // We create a bipartite flow graph where we put edges from catlover to
+    // doglover nodes if their votes are not simultaneously satisfiable.
+    // We also add a source node and add edges between the source and the catlover
+    // nodes. Similarily we add a sink node and add edges from doglover nodes
+    // to the sink node. We then run a standard Max-Flow algorithm
+    // (Edmonds-Karp in this case) to figure out the size of the minimum vertex
+    // cover in the bipartite graph. Since
+    // |Maximum independent set| = |V| - |Size of minimum vertex cover| this
+    // gives us the maximum number of simultaneously satisfiable voters/nodes.
 
 #define CATLOVER_NODE(i) (1 + i)
 #define DOGLOVER_NODE(i) (1 + (int)catLovers.size() + i)
@@ -159,7 +169,7 @@ int main(int argc, char* argv[])
     // Then we also have that the size of the maximum independent set is equal
     // to |V| - |Size of minimum vertex cover|. In other words
     // |Maximum independent set| = |V| - |Size of maximum matching|.
-    std::cout << V - maxFlow.flow() << std::endl;
+    printf("%d\n", V - maxFlow.flow());
   }
 
   return 0;
